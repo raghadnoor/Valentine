@@ -15,7 +15,6 @@ body {
     background: #ffb6c1;
     font-family: Arial, sans-serif;
     overflow: hidden;
-    position: relative;
 }
 
 .card {
@@ -35,7 +34,7 @@ h1 {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 20px; /* space between Yes and No */
+    gap: 20px;
     position: relative;
 }
 
@@ -60,7 +59,7 @@ button {
 
 #noBtn {
     background-color: #ccc;
-    position: absolute; /* so it can escape */
+    position: relative; /* initially relative so it stays in flex */
 }
 
 .celebration {
@@ -81,7 +80,6 @@ button {
 }
 </style>
 </head>
-
 <body>
 
 <div class="card">
@@ -97,23 +95,17 @@ button {
 const noBtn = document.getElementById("noBtn");
 const yesBtn = document.getElementById("yesBtn");
 const result = document.getElementById("result");
-const buttonContainer = document.querySelector(".button-container");
+const container = document.querySelector(".button-container");
 
-// Place NO initially exactly next to YES inside the container
-function placeNoBesideYes() {
-    const yesRect = yesBtn.getBoundingClientRect();
-    const containerRect = buttonContainer.getBoundingClientRect();
-
-    noBtn.style.left = (yesRect.right - containerRect.left + 10) + "px";
-    noBtn.style.top = (yesRect.top - containerRect.top) + "px";
-}
-placeNoBesideYes();
-
-// Escape logic: impossible to click
+// Escape logic
 function moveNoButton() {
     const rect = noBtn.getBoundingClientRect();
     const maxX = window.innerWidth - rect.width;
     const maxY = window.innerHeight - rect.height;
+
+    // Change to absolute position to escape
+    noBtn.style.position = "absolute";
+    noBtn.style.zIndex = 1000;
 
     const randomX = Math.random() * maxX;
     const randomY = Math.random() * maxY;
@@ -122,16 +114,11 @@ function moveNoButton() {
     noBtn.style.top = randomY + "px";
 }
 
-// Teleport before click happens
+// Teleport before user can click
 noBtn.addEventListener("mouseenter", moveNoButton);
 noBtn.addEventListener("mousedown", moveNoButton);
 noBtn.addEventListener("touchstart", moveNoButton);
-
-// Prevent click entirely
-noBtn.addEventListener("click", function(e){
-    e.preventDefault();
-    moveNoButton();
-});
+noBtn.addEventListener("click", e => { e.preventDefault(); moveNoButton(); });
 
 // YES button celebration
 yesBtn.addEventListener("click", () => {
@@ -140,7 +127,6 @@ yesBtn.addEventListener("click", () => {
 
     document.body.style.background = "#ff69b4";
 
-    // Floating hearts
     for (let i = 0; i < 50; i++) {
         const heart = document.createElement("div");
         heart.innerHTML = "💖";
