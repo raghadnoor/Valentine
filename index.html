@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Be My Valentine 💖</title>
+<style>
+    body {
+        margin: 0;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: #ffb6c1; /* pink background */
+        font-family: Arial, sans-serif;
+        overflow: hidden;
+    }
+
+    .card {
+        background: white;
+        padding: 40px;
+        border-radius: 20px;
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        position: relative;
+    }
+
+    h1 {
+        margin-bottom: 30px;
+        color: #ff4d88;
+    }
+
+    button {
+        padding: 10px 25px;
+        margin: 10px;
+        font-size: 16px;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    #yesBtn {
+        background-color: #ff4d88;
+        color: white;
+    }
+
+    #noBtn {
+        background-color: #ccc;
+        position: absolute;
+    }
+
+    .celebration {
+        font-size: 28px;
+        color: #ff4d88;
+        margin-top: 20px;
+        animation: pop 0.5s ease infinite alternate;
+    }
+
+    @keyframes pop {
+        from { transform: scale(1); }
+        to { transform: scale(1.1); }
+    }
+</style>
+</head>
+<body>
+
+<div class="card">
+    <h1>Will you be my Valentine? 💖</h1>
+    <button id="yesBtn">Yes 💕</button>
+    <button id="noBtn">No 🙈</button>
+    <div id="result"></div>
+</div>
+
+<script>
+    const noBtn = document.getElementById("noBtn");
+    const yesBtn = document.getElementById("yesBtn");
+    const result = document.getElementById("result");
+
+    // Make NO button escape
+    noBtn.addEventListener("mouseover", () => {
+        const x = Math.random() * (window.innerWidth - 100);
+        const y = Math.random() * (window.innerHeight - 50);
+        noBtn.style.left = x + "px";
+        noBtn.style.top = y + "px";
+    });
+
+    // Celebration when YES clicked
+    yesBtn.addEventListener("click", () => {
+        result.innerHTML = "Yaaay!! 🎉💖✨ You made me the happiest person!";
+        document.body.style.background = "#ff69b4";
+
+        // Simple confetti effect
+        for(let i = 0; i < 50; i++) {
+            const heart = document.createElement("div");
+            heart.innerHTML = "💖";
+            heart.style.position = "absolute";
+            heart.style.left = Math.random() * window.innerWidth + "px";
+            heart.style.top = Math.random() * window.innerHeight + "px";
+            heart.style.fontSize = "20px";
+            document.body.appendChild(heart);
+        }
+    });
+</script>
+
+</body>
+</html>
