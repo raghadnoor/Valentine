@@ -2,155 +2,166 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Be My Valentine 💖</title>
-
 <style>
-body {
-    margin: 0;
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: #ffb6c1;
-    font-family: Arial, sans-serif;
-    overflow: hidden;
-    position: relative;
-}
+    * { box-sizing: border-box; }
+    body {
+        margin: 0;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: #ff3333;
+        font-family: Arial, sans-serif;
+        overflow: hidden;
+        transition: background 0.5s;
+    }
+    .card {
+        background: white;
+        padding: 40px 50px;
+        border-radius: 20px;
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        position: relative;
+        z-index: 10;
+    }
+    h1 {
+        margin-bottom: 30px;
+        color: #cc0000;
+    }
+    .btn-row {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+    }
+    button {
+        padding: 12px 28px;
+        font-size: 16px;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: transform 0.1s;
+    }
+    #yesBtn {
+        background-color: #cc0000;
+        color: white;
+    }
+    #yesBtn:hover { transform: scale(1.05); }
 
-.card {
-    background: white;
-    padding: 50px 60px;
-    border-radius: 20px;
-    text-align: center;
-    box-shadow: 0 15px 40px rgba(0,0,0,0.2);
-}
+    /* No button: fixed position so it can move freely anywhere on screen */
+    #noBtn {
+        background-color: #aaa;
+        color: white;
+        position: fixed;
+        z-index: 999;
+        transition: left 0.08s ease, top 0.08s ease;
+        pointer-events: auto;
+    }
 
-h1 {
-    margin-bottom: 30px;
-    color: #ff4d88;
-}
+    .celebration {
+        font-size: 24px;
+        color: #cc0000;
+        margin-top: 20px;
+        animation: pop 0.5s ease infinite alternate;
+    }
+    @keyframes pop {
+        from { transform: scale(1); }
+        to   { transform: scale(1.1); }
+    }
 
-button {
-    padding: 12px 30px;
-    margin: 10px;
-    font-size: 16px;
-    border: none;
-    border-radius: 12px;
-    cursor: pointer;
-}
-
-#yesBtn {
-    background-color: #ff4d88;
-    color: white;
-    transition: 0.3s;
-}
-
-#yesBtn:hover {
-    transform: scale(1.1);
-    background-color: #ff1a75;
-}
-
-#noBtn {
-    background-color: #ccc;
-    position: absolute;
-}
-
-.celebration {
-    font-size: 24px;
-    color: #ff4d88;
-    margin-top: 20px;
-    animation: pop 0.6s ease infinite alternate;
-}
-
-@keyframes pop {
-    from { transform: scale(1); }
-    to { transform: scale(1.1); }
-}
-
-@keyframes float {
-    0% { transform: translateY(0); opacity:1; }
-    100% { transform: translateY(-300px); opacity:0; }
-}
+    .heart-float {
+        position: fixed;
+        font-size: 22px;
+        pointer-events: none;
+        animation: floatUp 2.5s ease-out forwards;
+        z-index: 5;
+    }
+    @keyframes floatUp {
+        0%   { opacity: 1; transform: translateY(0) scale(1); }
+        100% { opacity: 0; transform: translateY(-200px) scale(1.4); }
+    }
 </style>
 </head>
-
 <body>
 
 <div class="card">
-    <h1>Will you be my Valentine? 💖</h1>
-    <button id="yesBtn">Yes 💕</button>
+    <h1>Will you be my Valentine? ❤️</h1>
+    <div class="btn-row">
+        <button id="yesBtn">Yes 💕</button>
+        <!-- No button placeholder to reserve layout space -->
+        <div style="width:110px;height:44px;"></div>
+    </div>
     <div id="result"></div>
 </div>
 
-<!-- NO button starts beside YES -->
+<!-- No button lives outside the card so it can roam the full screen -->
 <button id="noBtn">No 🙈</button>
 
 <script>
-const noBtn = document.getElementById("noBtn");
-const yesBtn = document.getElementById("yesBtn");
-const result = document.getElementById("result");
+    const noBtn   = document.getElementById("noBtn");
+    const yesBtn  = document.getElementById("yesBtn");
+    const result  = document.getElementById("result");
 
-// Place NO button initially beside YES
-function placeNoBesideYes() {
-    const yesRect = yesBtn.getBoundingClientRect();
-    const bodyRect = document.body.getBoundingClientRect();
-    
-    // Place NO right to YES button with 10px gap
-    noBtn.style.left = (yesRect.right + 10) + "px";
-    noBtn.style.top = yesRect.top + "px";
-}
-placeNoBesideYes();
-
-// Escape logic: impossible to click
-function moveNoButton() {
-    const rect = noBtn.getBoundingClientRect();
-    const maxX = window.innerWidth - rect.width;
-    const maxY = window.innerHeight - rect.height;
-
-    const randomX = Math.random() * maxX;
-    const randomY = Math.random() * maxY;
-
-    noBtn.style.left = randomX + "px";
-    noBtn.style.top = randomY + "px";
-}
-
-// Teleport before click happens
-noBtn.addEventListener("mouseenter", moveNoButton);
-noBtn.addEventListener("mousedown", moveNoButton);
-noBtn.addEventListener("touchstart", moveNoButton);
-
-// Extra protection: prevent click entirely
-noBtn.addEventListener("click", function(e){
-    e.preventDefault();
-    moveNoButton();
-});
-
-// Celebration on YES click
-yesBtn.addEventListener("click", () => {
-
-    result.innerHTML =
-        "<div class='celebration'>Yaaay!! 🎉💖✨ You made me the happiest person!</div>";
-
-    document.body.style.background = "#ff69b4";
-
-    // Floating hearts
-    for (let i = 0; i < 50; i++) {
-        const heart = document.createElement("div");
-        heart.innerHTML = "💖";
-        heart.style.position = "absolute";
-        heart.style.left = Math.random() * window.innerWidth + "px";
-        heart.style.top = window.innerHeight + "px";
-        heart.style.fontSize = (Math.random() * 20 + 15) + "px";
-        heart.style.animation = "float 3s linear";
-        document.body.appendChild(heart);
-
-        setTimeout(() => heart.remove(), 3000);
+    // --- Position the No button initially right next to the Yes button ---
+    function initNoBtnPosition() {
+        const yesRect = yesBtn.getBoundingClientRect();
+        noBtn.style.left = (yesRect.right + 20) + "px";
+        noBtn.style.top  = yesRect.top + "px";
     }
+    initNoBtnPosition();
+    window.addEventListener("resize", initNoBtnPosition);
 
-    noBtn.style.display = "none";
-});
+    // --- Escape logic: flee from mouse cursor ---
+    const FLEE_RADIUS = 160; // pixels — how close before it runs
+    const FLEE_DIST   = 220; // how far it jumps
+
+    document.addEventListener("mousemove", (e) => {
+        const btnRect  = noBtn.getBoundingClientRect();
+        const btnCX    = btnRect.left + btnRect.width  / 2;
+        const btnCY    = btnRect.top  + btnRect.height / 2;
+
+        const dx = btnCX - e.clientX;
+        const dy = btnCY - e.clientY;
+        const dist = Math.hypot(dx, dy);
+
+        if (dist < FLEE_RADIUS) {
+            // Direction away from cursor
+            const angle = Math.atan2(dy, dx);
+
+            let newX = btnCX + Math.cos(angle) * FLEE_DIST - btnRect.width  / 2;
+            let newY = btnCY + Math.sin(angle) * FLEE_DIST - btnRect.height / 2;
+
+            // Clamp so it stays fully within the viewport
+            const margin = 10;
+            newX = Math.max(margin, Math.min(window.innerWidth  - btnRect.width  - margin, newX));
+            newY = Math.max(margin, Math.min(window.innerHeight - btnRect.height - margin, newY));
+
+            noBtn.style.left = newX + "px";
+            noBtn.style.top  = newY + "px";
+        }
+    });
+
+    // --- Yes button celebration ---
+    yesBtn.addEventListener("click", () => {
+        result.innerHTML = '<div class="celebration">Yaaay!! 😏🐝💗 You made me the happiest person!</div>';
+        document.body.style.background = "#990000";
+
+        // Spawn floating hearts
+        for (let i = 0; i < 60; i++) {
+            setTimeout(() => {
+                const heart = document.createElement("div");
+                heart.className = "heart-float";
+                heart.innerHTML = ["❤️","💕","💖","💗","💓"][Math.floor(Math.random() * 5)];
+                heart.style.left = Math.random() * window.innerWidth  + "px";
+                heart.style.top  = Math.random() * window.innerHeight + "px";
+                heart.style.fontSize = (16 + Math.random() * 20) + "px";
+                document.body.appendChild(heart);
+                setTimeout(() => heart.remove(), 2600);
+            }, i * 40);
+        }
+
+        noBtn.style.display = "none";
+    });
 </script>
-
 </body>
 </html>
