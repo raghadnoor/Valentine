@@ -2,7 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Be My Valentine 💖</title>
+
 <style>
     body {
         margin: 0;
@@ -10,33 +12,34 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        background: #ffb6c1; /* pink background */
+        background: #ffb6c1;
         font-family: Arial, sans-serif;
         overflow: hidden;
     }
 
     .card {
         background: white;
-        padding: 40px;
+        padding: 50px 60px;
         border-radius: 20px;
         text-align: center;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        box-shadow: 0 15px 40px rgba(0,0,0,0.2);
         position: relative;
     }
 
     h1 {
         margin-bottom: 30px;
         color: #ff4d88;
+        font-size: 28px;
     }
 
     button {
-        padding: 10px 25px;
+        padding: 12px 30px;
         margin: 10px;
         font-size: 16px;
         border: none;
-        border-radius: 10px;
+        border-radius: 12px;
         cursor: pointer;
-        transition: 0.3s;
+        transition: transform 0.15s ease, background 0.3s ease;
     }
 
     #yesBtn {
@@ -44,24 +47,48 @@
         color: white;
     }
 
+    #yesBtn:hover {
+        background-color: #ff1a75;
+        transform: scale(1.1);
+    }
+
     #noBtn {
-        background-color: #ccc;
-        position: absolute;
+        background-color: #cccccc;
+        color: black;
+        position: relative;
     }
 
     .celebration {
-        font-size: 28px;
+        font-size: 24px;
         color: #ff4d88;
         margin-top: 20px;
-        animation: pop 0.5s ease infinite alternate;
+        animation: pop 0.6s ease infinite alternate;
     }
 
     @keyframes pop {
         from { transform: scale(1); }
         to { transform: scale(1.1); }
     }
+
+    .heart {
+        position: absolute;
+        font-size: 20px;
+        animation: float 3s linear infinite;
+    }
+
+    @keyframes float {
+        0% {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        100% {
+            transform: translateY(-300px);
+            opacity: 0;
+        }
+    }
 </style>
 </head>
+
 <body>
 
 <div class="card">
@@ -72,34 +99,53 @@
 </div>
 
 <script>
-    const noBtn = document.getElementById("noBtn");
-    const yesBtn = document.getElementById("yesBtn");
-    const result = document.getElementById("result");
+const noBtn = document.getElementById("noBtn");
+const yesBtn = document.getElementById("yesBtn");
+const result = document.getElementById("result");
 
-    // Make NO button escape
-    noBtn.addEventListener("mouseover", () => {
-        const x = Math.random() * (window.innerWidth - 100);
-        const y = Math.random() * (window.innerHeight - 50);
-        noBtn.style.left = x + "px";
-        noBtn.style.top = y + "px";
-    });
+// Make NO button escape smoothly from cursor
+document.addEventListener("mousemove", (e) => {
+    const rect = noBtn.getBoundingClientRect();
 
-    // Celebration when YES clicked
-    yesBtn.addEventListener("click", () => {
-        result.innerHTML = "Yaaay!! 🎉💖✨ You made me the happiest person!";
-        document.body.style.background = "#ff69b4";
+    const btnCenterX = rect.left + rect.width / 2;
+    const btnCenterY = rect.top + rect.height / 2;
 
-        // Simple confetti effect
-        for(let i = 0; i < 50; i++) {
-            const heart = document.createElement("div");
-            heart.innerHTML = "💖";
-            heart.style.position = "absolute";
-            heart.style.left = Math.random() * window.innerWidth + "px";
-            heart.style.top = Math.random() * window.innerHeight + "px";
-            heart.style.fontSize = "20px";
-            document.body.appendChild(heart);
-        }
-    });
+    const distanceX = e.clientX - btnCenterX;
+    const distanceY = e.clientY - btnCenterY;
+
+    const distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+
+    // Escape if mouse is close
+    if (distance < 120) {
+        const moveX = -distanceX * 0.4;
+        const moveY = -distanceY * 0.4;
+
+        noBtn.style.transform = `translate(${moveX}px, ${moveY}px)`;
+    }
+});
+
+// Celebration when YES clicked
+yesBtn.addEventListener("click", () => {
+
+    result.innerHTML = "<div class='celebration'>Yaaay!! 🎉💖✨ You made me the happiest person!</div>";
+    document.body.style.background = "#ff69b4";
+
+    // Floating hearts
+    for (let i = 0; i < 40; i++) {
+        const heart = document.createElement("div");
+        heart.innerHTML = "💖";
+        heart.classList.add("heart");
+        heart.style.left = Math.random() * window.innerWidth + "px";
+        heart.style.top = window.innerHeight + "px";
+        heart.style.fontSize = (Math.random() * 20 + 15) + "px";
+        heart.style.animationDuration = (Math.random() * 2 + 2) + "s";
+        document.body.appendChild(heart);
+
+        setTimeout(() => {
+            heart.remove();
+        }, 3000);
+    }
+});
 </script>
 
 </body>
