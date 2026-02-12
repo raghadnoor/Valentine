@@ -31,19 +31,26 @@ h1 {
     color: #ff4d88;
 }
 
+.button-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px; /* space between Yes and No */
+    position: relative;
+}
+
 button {
     padding: 12px 30px;
-    margin: 10px;
     font-size: 16px;
     border: none;
     border-radius: 12px;
     cursor: pointer;
+    transition: transform 0.2s ease, background 0.3s ease;
 }
 
 #yesBtn {
     background-color: #ff4d88;
     color: white;
-    transition: 0.3s;
 }
 
 #yesBtn:hover {
@@ -53,7 +60,7 @@ button {
 
 #noBtn {
     background-color: #ccc;
-    position: absolute;
+    position: absolute; /* so it can escape */
 }
 
 .celebration {
@@ -79,26 +86,26 @@ button {
 
 <div class="card">
     <h1>Will you be my Valentine? 💖</h1>
-    <button id="yesBtn">Yes 💕</button>
+    <div class="button-container">
+        <button id="yesBtn">Yes 💕</button>
+        <button id="noBtn">No 🙈</button>
+    </div>
     <div id="result"></div>
 </div>
-
-<!-- NO button starts beside YES -->
-<button id="noBtn">No 🙈</button>
 
 <script>
 const noBtn = document.getElementById("noBtn");
 const yesBtn = document.getElementById("yesBtn");
 const result = document.getElementById("result");
+const buttonContainer = document.querySelector(".button-container");
 
-// Place NO button initially beside YES
+// Place NO initially exactly next to YES inside the container
 function placeNoBesideYes() {
     const yesRect = yesBtn.getBoundingClientRect();
-    const bodyRect = document.body.getBoundingClientRect();
-    
-    // Place NO right to YES button with 10px gap
-    noBtn.style.left = (yesRect.right + 10) + "px";
-    noBtn.style.top = yesRect.top + "px";
+    const containerRect = buttonContainer.getBoundingClientRect();
+
+    noBtn.style.left = (yesRect.right - containerRect.left + 10) + "px";
+    noBtn.style.top = (yesRect.top - containerRect.top) + "px";
 }
 placeNoBesideYes();
 
@@ -120,15 +127,14 @@ noBtn.addEventListener("mouseenter", moveNoButton);
 noBtn.addEventListener("mousedown", moveNoButton);
 noBtn.addEventListener("touchstart", moveNoButton);
 
-// Extra protection: prevent click entirely
+// Prevent click entirely
 noBtn.addEventListener("click", function(e){
     e.preventDefault();
     moveNoButton();
 });
 
-// Celebration on YES click
+// YES button celebration
 yesBtn.addEventListener("click", () => {
-
     result.innerHTML =
         "<div class='celebration'>Yaaay!! 🎉💖✨ You made me the happiest person!</div>";
 
