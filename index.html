@@ -54,7 +54,7 @@
         color: white;
         position: fixed;
         z-index: 999;
-        transition: left 0.08s ease, top 0.08s ease;
+        transition: none;
         pointer-events: auto;
     }
 
@@ -112,32 +112,57 @@
     window.addEventListener("resize", initNoBtnPosition);
 
     // --- Escape logic: flee from mouse cursor ---
-    const FLEE_RADIUS = 160; // pixels — how close before it runs
-    const FLEE_DIST   = 220; // how far it jumps
+    const FLEE_RADIUS = 180; // pixels — how close before it runs
+    const FLEE_DIST   = 260; // how far it tries to jump
 
     document.addEventListener("mousemove", (e) => {
-        const btnRect  = noBtn.getBoundingClientRect();
-        const btnCX    = btnRect.left + btnRect.width  / 2;
-        const btnCY    = btnRect.top  + btnRect.height / 2;
+        const btnRect = noBtn.getBoundingClientRect();
+        const bW = btnRect.width;
+        const bH = btnRect.height;
+        const btnCX = btnRect.left + bW / 2;
+        const btnCY = btnRect.top  + bH / 2;
 
-        const dx = btnCX - e.clientX;
-        const dy = btnCY - e.clientY;
+        const dx   = btnCX - e.clientX;
+        const dy   = btnCY - e.clientY;
         const dist = Math.hypot(dx, dy);
 
         if (dist < FLEE_RADIUS) {
-            // Direction away from cursor
-            const angle = Math.atan2(dy, dx);
+            const margin  = 12;
+            const maxX    = window.innerWidth  - bW - margin;
+            const maxY    = window.innerHeight - bH - margin;
+            const baseAngle = Math.atan2(dy, dx);
 
-            let newX = btnCX + Math.cos(angle) * FLEE_DIST - btnRect.width  / 2;
-            let newY = btnCY + Math.sin(angle) * FLEE_DIST - btnRect.height / 2;
+            // Try 24 candidate angles spread around the base escape direction.
+            // Pick the candidate that lands farthest from the cursor (after clamping).
+            let bestX = -1, bestY = -1, bestFinalDist = -1;
 
-            // Clamp so it stays fully within the viewport
-            const margin = 10;
-            newX = Math.max(margin, Math.min(window.innerWidth  - btnRect.width  - margin, newX));
-            newY = Math.max(margin, Math.min(window.innerHeight - btnRect.height - margin, newY));
+            for (let i = 0; i < 24; i++) {
+                // Spread: 0, ±15°, ±30° ... up to ±172.5° in alternating order
+                const side  = (i % 2 === 0 ? 1 : -1);
+                const step  = Math.floor((i + 1) / 2);
+                const angle = baseAngle + side * step * (Math.PI / 12);
 
-            noBtn.style.left = newX + "px";
-            noBtn.style.top  = newY + "px";
+                // Candidate target (button centre)
+                let cx = btnCX + Math.cos(angle) * FLEE_DIST;
+                let cy = btnCY + Math.sin(angle) * FLEE_DIST;
+
+                // Convert to top-left and clamp inside viewport
+                let lx = Math.max(margin, Math.min(maxX, cx - bW / 2));
+                let ly = Math.max(margin, Math.min(maxY, cy - bH / 2));
+
+                // Measure actual distance from cursor after clamping
+                const finalDist = Math.hypot((lx + bW/2) - e.clientX,
+                                             (ly + bH/2) - e.clientY);
+
+                if (finalDist > bestFinalDist) {
+                    bestFinalDist = finalDist;
+                    bestX = lx;
+                    bestY = ly;
+                }
+            }
+
+            noBtn.style.left = bestX + "px";
+            noBtn.style.top  = bestY + "px";
         }
     });
 
