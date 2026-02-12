@@ -6,81 +6,72 @@
 <title>Be My Valentine 💖</title>
 
 <style>
-    body {
-        margin: 0;
-        height: 100vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        background: #ffb6c1;
-        font-family: Arial, sans-serif;
-        overflow: hidden;
-        position: relative;
-    }
+body {
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #ffb6c1;
+    font-family: Arial, sans-serif;
+    overflow: hidden;
+    position: relative;
+}
 
-    .card {
-        background: white;
-        padding: 50px 60px;
-        border-radius: 20px;
-        text-align: center;
-        box-shadow: 0 15px 40px rgba(0,0,0,0.2);
-    }
+.card {
+    background: white;
+    padding: 50px 60px;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+}
 
-    h1 {
-        margin-bottom: 30px;
-        color: #ff4d88;
-        font-size: 28px;
-    }
+h1 {
+    margin-bottom: 30px;
+    color: #ff4d88;
+}
 
-    button {
-        padding: 12px 30px;
-        margin: 10px;
-        font-size: 16px;
-        border: none;
-        border-radius: 12px;
-        cursor: pointer;
-    }
+button {
+    padding: 12px 30px;
+    margin: 10px;
+    font-size: 16px;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+}
 
-    #yesBtn {
-        background-color: #ff4d88;
-        color: white;
-        transition: transform 0.2s ease, background 0.3s ease;
-    }
+#yesBtn {
+    background-color: #ff4d88;
+    color: white;
+    transition: 0.3s;
+}
 
-    #yesBtn:hover {
-        background-color: #ff1a75;
-        transform: scale(1.1);
-    }
+#yesBtn:hover {
+    transform: scale(1.1);
+    background-color: #ff1a75;
+}
 
-    #noBtn {
-        background-color: #cccccc;
-        color: black;
-        position: absolute;
-    }
+#noBtn {
+    background-color: #ccc;
+    position: absolute;
+}
 
-    .celebration {
-        font-size: 24px;
-        color: #ff4d88;
-        margin-top: 20px;
-        animation: pop 0.6s ease infinite alternate;
-    }
+.celebration {
+    font-size: 24px;
+    color: #ff4d88;
+    margin-top: 20px;
+    animation: pop 0.6s ease infinite alternate;
+}
 
-    @keyframes pop {
-        from { transform: scale(1); }
-        to { transform: scale(1.1); }
-    }
+@keyframes pop {
+    from { transform: scale(1); }
+    to { transform: scale(1.1); }
+}
 
-    @keyframes float {
-        0% {
-            transform: translateY(0);
-            opacity: 1;
-        }
-        100% {
-            transform: translateY(-300px);
-            opacity: 0;
-        }
-    }
-
+@keyframes float {
+    0% { transform: translateY(0); opacity:1; }
+    100% { transform: translateY(-300px); opacity:0; }
+}
 </style>
 </head>
 
@@ -92,7 +83,6 @@
     <div id="result"></div>
 </div>
 
-<!-- NO button is outside card so it can escape freely -->
 <button id="noBtn">No 🙈</button>
 
 <script>
@@ -100,38 +90,33 @@ const noBtn = document.getElementById("noBtn");
 const yesBtn = document.getElementById("yesBtn");
 const result = document.getElementById("result");
 
-// Initial placement of NO button
-function placeInitialPosition() {
-    noBtn.style.left = (window.innerWidth / 2 + 80) + "px";
-    noBtn.style.top = (window.innerHeight / 2 + 40) + "px";
+// Place NO randomly
+function moveNoButton() {
+    const maxX = window.innerWidth - noBtn.offsetWidth;
+    const maxY = window.innerHeight - noBtn.offsetHeight;
+
+    const randomX = Math.random() * maxX;
+    const randomY = Math.random() * maxY;
+
+    noBtn.style.left = randomX + "px";
+    noBtn.style.top = randomY + "px";
 }
-placeInitialPosition();
 
-// Escape logic
-document.addEventListener("mousemove", (e) => {
+// Initial position
+moveNoButton();
 
-    const rect = noBtn.getBoundingClientRect();
-    const buffer = 100;
+// TELEPORT before click can happen
+noBtn.addEventListener("mouseenter", moveNoButton);
+noBtn.addEventListener("mousedown", moveNoButton);
+noBtn.addEventListener("touchstart", moveNoButton);
 
-    const isNear =
-        e.clientX > rect.left - buffer &&
-        e.clientX < rect.right + buffer &&
-        e.clientY > rect.top - buffer &&
-        e.clientY < rect.bottom + buffer;
-
-    if (isNear) {
-        const maxX = window.innerWidth - rect.width;
-        const maxY = window.innerHeight - rect.height;
-
-        const randomX = Math.random() * maxX;
-        const randomY = Math.random() * maxY;
-
-        noBtn.style.left = randomX + "px";
-        noBtn.style.top = randomY + "px";
-    }
+// Extra protection: prevent click completely
+noBtn.addEventListener("click", function(e){
+    e.preventDefault();
+    moveNoButton();
 });
 
-// Celebration on YES click
+// YES button celebration
 yesBtn.addEventListener("click", () => {
 
     result.innerHTML =
@@ -139,7 +124,6 @@ yesBtn.addEventListener("click", () => {
 
     document.body.style.background = "#ff69b4";
 
-    // Floating hearts
     for (let i = 0; i < 50; i++) {
         const heart = document.createElement("div");
         heart.innerHTML = "💖";
@@ -148,13 +132,11 @@ yesBtn.addEventListener("click", () => {
         heart.style.top = window.innerHeight + "px";
         heart.style.fontSize = (Math.random() * 20 + 15) + "px";
         heart.style.animation = "float 3s linear";
-
         document.body.appendChild(heart);
 
         setTimeout(() => heart.remove(), 3000);
     }
 
-    // Optional: Hide NO button forever 😈
     noBtn.style.display = "none";
 });
 </script>
