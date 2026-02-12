@@ -83,6 +83,7 @@ button {
     <div id="result"></div>
 </div>
 
+<!-- NO button starts beside YES -->
 <button id="noBtn">No 🙈</button>
 
 <script>
@@ -90,10 +91,22 @@ const noBtn = document.getElementById("noBtn");
 const yesBtn = document.getElementById("yesBtn");
 const result = document.getElementById("result");
 
-// Place NO randomly
+// Place NO button initially beside YES
+function placeNoBesideYes() {
+    const yesRect = yesBtn.getBoundingClientRect();
+    const bodyRect = document.body.getBoundingClientRect();
+    
+    // Place NO right to YES button with 10px gap
+    noBtn.style.left = (yesRect.right + 10) + "px";
+    noBtn.style.top = yesRect.top + "px";
+}
+placeNoBesideYes();
+
+// Escape logic: impossible to click
 function moveNoButton() {
-    const maxX = window.innerWidth - noBtn.offsetWidth;
-    const maxY = window.innerHeight - noBtn.offsetHeight;
+    const rect = noBtn.getBoundingClientRect();
+    const maxX = window.innerWidth - rect.width;
+    const maxY = window.innerHeight - rect.height;
 
     const randomX = Math.random() * maxX;
     const randomY = Math.random() * maxY;
@@ -102,21 +115,18 @@ function moveNoButton() {
     noBtn.style.top = randomY + "px";
 }
 
-// Initial position
-moveNoButton();
-
-// TELEPORT before click can happen
+// Teleport before click happens
 noBtn.addEventListener("mouseenter", moveNoButton);
 noBtn.addEventListener("mousedown", moveNoButton);
 noBtn.addEventListener("touchstart", moveNoButton);
 
-// Extra protection: prevent click completely
+// Extra protection: prevent click entirely
 noBtn.addEventListener("click", function(e){
     e.preventDefault();
     moveNoButton();
 });
 
-// YES button celebration
+// Celebration on YES click
 yesBtn.addEventListener("click", () => {
 
     result.innerHTML =
@@ -124,6 +134,7 @@ yesBtn.addEventListener("click", () => {
 
     document.body.style.background = "#ff69b4";
 
+    // Floating hearts
     for (let i = 0; i < 50; i++) {
         const heart = document.createElement("div");
         heart.innerHTML = "💖";
